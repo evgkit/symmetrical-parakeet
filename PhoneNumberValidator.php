@@ -17,14 +17,12 @@ class PhoneNumberValidator
 	{
 		try {
 			$dsn = "mysql:host=localhost;dbname=test";
-			$options = array(
-					PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
-			);
+			$options = [
+				PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
+			];
 			$pdo = new PDO($dsn, 'root', '1', $options);
 
-			//$db = new PDO('mysql:host=localhost;dbname=test;port=3306,root,1');
 			//$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			//$db->exec("SET NAMES 'utf8'");
 			$this->_pdo = $pdo;
 		} catch (\Exception $e) {
 			echo 'Could not connect to the database.';
@@ -33,7 +31,7 @@ class PhoneNumberValidator
 
 	/**
 	 * @param $phoneNumber
-	 * @return string
+	 * @return array
 	 */
 	public function validate($phoneNumber)
 	{
@@ -47,7 +45,9 @@ class PhoneNumberValidator
 			$phoneNumberString = implode($phoneNumber);
 
 			$query = $this->_pdo->query("
-				SELECT gcode_cns AS 'cns',
+				SELECT gcode_id AS 'id',
+					   gcode_cns AS 'cns',
+					   gcode_area_len AS 'area',
 					   gcode_nr_min_len AS 'min',
 					   gcode_nr_max_len AS 'max'
 				FROM geo_codes
@@ -61,21 +61,26 @@ class PhoneNumberValidator
 				$phoneLength = count($phoneNumber);
 				$patternLength = strlen($pattern);
 
-				while (strlen($pattern) <= $phoneLength) {
+				while ($i <= $phoneLength) {
 					foreach ($results as $result) {
+						// $phoneLength += $result['area'];
 						if (
 							$result['cns'] == $pattern &&
-							$result['min'] <= ($phoneLength - 1 - $patternLength)
-							&& ($phoneLength - 1 - $patternLength) <= $result['max']
+							$result['min'] <= ($phoneLength - $patternLength)
+							&& ($phoneLength - $patternLength) <= $result['max']
 						) {
 							$variants[] = [
-								$result['cns'],
-								substr($phoneNumberString, $patternLength - 1)
+								'id' => $result['id'],
+								'phoneNumber' => [
+									'cns' => $result['cns'],
+									'number' => substr($phoneNumberString, $patternLength - 1)
+								]
 							];
 						}
 					}
 
 					$pattern .= $phoneNumber[++$i];
+					$patternLength = strlen($pattern);
 				}
 
 			}

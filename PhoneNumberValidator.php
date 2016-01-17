@@ -1,28 +1,28 @@
 <?php
+
 /**
  * @author e 13.01.2016
  */
-
 class PhoneNumberValidator
 {
-	/**
-	 * @var PDO
+    /**
+     * @var PDO
      */
-	private $_pdo;
+    private $_pdo;
 
     /**
      * Минимальный размер телефонного номера с кодом страны и кодом оператора
      * @var int
      */
-    private static $_min = 8; 
+    private static $_min = 8;
 
-	/**
-	 * PhoneNumberValidator constructor.
-	 */
-	public function __construct()
-	{
+    /**
+     * PhoneNumberValidator constructor.
+     */
+    public function __construct()
+    {
 
-	}
+    }
 
     /**
      * Подключение к БД
@@ -42,31 +42,31 @@ class PhoneNumberValidator
         }
     }
 
-	/**
-	 * @param $input
-	 * @return array
-	 */
-	public function run($input)
-	{
-		try {
+    /**
+     * @param $input
+     * @return array
+     */
+    public function run($input)
+    {
+        try {
             $this->init();
 
-			$number = $this->filter($input);
-			$geoCodes = $this->getGeoCodes($number[0]);
+            $number = $this->filter($input);
+            $geoCodes = $this->getGeoCodes($number[0]);
             $data = $this->validate($number, $geoCodes);
 
             $data = $this->format($data);
 
-			return [
-				'message' => 'Найдены следующие значения:',
-				'data'	  => $data
-			];
-		} catch (\Exception $e) {
-			return [
-				'message' => $e->getMessage()
-			];
-		}
-	}
+            return [
+                'message' => 'Найдены следующие значения:',
+                'data'    => $data
+            ];
+        } catch (\Exception $e) {
+            return [
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 
     /**
      * Фильтрует ввод сохраняя только цифры и отдаёт их в виде массива
@@ -124,7 +124,7 @@ class PhoneNumberValidator
         } else {
             throw new \Exception('Нет совпадений');
         }
-    }    
+    }
 
     /**
      * Запрашивает все записи начинающиеся с первой цифры номера телефона, кэширует запрос, не экономит на спичках.
@@ -183,7 +183,7 @@ class PhoneNumberValidator
 
             foreach ($labels as $code => $label) {
                 $item[$code] = [
-                    'name' => $label,
+                    'name'  => $label,
                     'value' => $item[$code]
                 ];
 

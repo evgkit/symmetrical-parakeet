@@ -25,7 +25,7 @@ $(document).ready(function() {
                         $('<p>').text(r.message).prependTo('#output');
                     }
 
-                    if (null !== r.data) {
+                    if (typeof r.data !== 'undefined') {
                         $('<table class="table">').appendTo('#output');
                         $('<thead>').appendTo('table');
                         $('<tbody>').appendTo('table');

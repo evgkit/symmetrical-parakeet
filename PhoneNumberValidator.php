@@ -21,17 +21,26 @@ class PhoneNumberValidator
 	 */
 	public function __construct()
 	{
-		try {
-			$options = [
-				PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
-			];
-			$pdo = new PDO('mysql:host=localhost;dbname=test', 'root', '1', $options);
 
-			$this->_pdo = $pdo;
-		} catch (\Exception $e) {
-			echo 'Could not connect to the database';
-		}
 	}
+
+    /**
+     * Подключение к БД
+     * @throws Exception
+     */
+    private function init()
+    {
+        try {
+            $options = [
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
+            ];
+            $pdo = new PDO('mysql:host=localhost;dbname=test', 'root', '1', $options);
+
+            $this->_pdo = $pdo;
+        } catch (\Exception $e) {
+            throw new \Exception('Ошибка: Невозможно подключиться к базе данных');
+        }
+    }
 
 	/**
 	 * @param $input
@@ -40,11 +49,13 @@ class PhoneNumberValidator
 	public function run($input)
 	{
 		try {
+            $this->init();
+
 			$number = $this->filter($input);
 			$geoCodes = $this->getGeoCodes($number[0]);
             $data = $this->validate($number, $geoCodes);
 
-            $data = $this->brushData($data);
+            $data = $this->format($data);
 
 			return [
 				'message' => 'Найдены следующие значения:',
@@ -75,7 +86,7 @@ class PhoneNumberValidator
     }
 
     /**
-     * НУ тут сплошная магия
+     * Тут магия
      * @param $number
      * @param $geoCodes
      * @return array
@@ -123,7 +134,7 @@ class PhoneNumberValidator
      */
     private function getGeoCodes($firstDigit)
     {
-        // FIXME: написать кэширование
+        // TODO: написать кэширование
         $query = $this->_pdo->query("
             SELECT *
             FROM geo_codes
@@ -138,11 +149,11 @@ class PhoneNumberValidator
     }
 
     /**
-     * Причесывает вывод для фронтенда
+     * Форматируем вывод для фронтенда
      * @param $data
      * @return array
      */
-    private function brushData($data)
+    private function format($data)
     {
         $unnecessaryKeys = [
             'gcode_id',

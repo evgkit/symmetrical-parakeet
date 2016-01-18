@@ -3,12 +3,10 @@
  * @Author: e 15.01.2016
  */
 
-if ($tel = isset($_REQUEST['tel']) ? trim($_REQUEST['tel']) : '') {
-    function __autoload($class_name) {
-        require_once $class_name . '.php';
-    }
+include './bootstrap.php';
 
-    $validator = new PhoneNumberValidator();
+if ($tel = isset($_REQUEST['tel']) ? trim($_REQUEST['tel']) : '') {
+    $validator = new e\PhoneNumberValidator();
     $data = $validator->run($tel);
     echo json_encode($data);
 }

@@ -1,5 +1,10 @@
 <?php
 
+namespace e;
+
+use Exception;
+use PDO;
+
 /**
  * @author e 13.01.2016
  */
@@ -32,7 +37,7 @@ class PhoneNumberValidator
     {
         try {
             $options = [
-                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
             ];
             $pdo = new PDO('mysql:host=localhost;dbname=test', 'root', '1', $options);
 
@@ -194,3 +199,4 @@ class PhoneNumberValidator
         return $data;
     }
 }
+
